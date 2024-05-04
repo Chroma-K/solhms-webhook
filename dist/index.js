@@ -6,13 +6,29 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const app = (0, express_1.default)();
-const port = process.env.PORT || 3000; // Vercel will set the PORT environment variable
 app.use(body_parser_1.default.json());
-app.post("/webhook", (req, res) => {
-    console.log("Webhook received:", req.body);
-    // Process the webhook payload
-    res.status(200).send("Webhook processed");
+const PORT = process.env.PORT || 3000;
+// Placeholder for sum storage
+let totalRevenue = 0;
+const tierOneSubPrice = 3.99; // Adjust this to your Tier 1 subscription price
+app.post("/kofi", (req, res) => {
+    const amount = parseFloat(req.body.amount);
+    totalRevenue += amount;
+    res.status(200).send("Received Ko-fi notification");
 });
-app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
+app.post("/twitch", (req, res) => {
+    const { tier } = req.body;
+    const valueToAdd = tier === "Tier 3"
+        ? 5 * tierOneSubPrice
+        : tier === "Tier 2"
+            ? 2 * tierOneSubPrice
+            : tierOneSubPrice;
+    totalRevenue += valueToAdd;
+    res.status(200).send("Received Twitch subscription");
+});
+app.get("/total", (req, res) => {
+    res.status(200).json({ totalRevenue });
+});
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
