@@ -3,15 +3,17 @@ import bodyParser from "body-parser";
 
 const app = express();
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 const PORT = process.env.PORT || 3000;
 
 // Placeholder for sum storage
 let totalRevenue = 0;
-const tierOneSubPrice = 3.99; // Adjust this to your Tier 1 subscription price
+const tierOneSubPrice = 3.99;
 
 app.post("/kofi", (req, res) => {
-  const amount = parseFloat(req.body.amount);
+  const data = JSON.parse(req.body.data);
+  const amount = parseFloat(data.amount);
   totalRevenue += amount;
   res.status(200).send("Received Ko-fi notification");
 });
